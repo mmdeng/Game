@@ -6,23 +6,16 @@ namespace Tetris
 	{
 		private Data dat;
 
-		private int		_nMoveLeftCount;		// 左移動ｽﾋﾟｰﾄﾞ
-		private int		_nMoveRightCount;		// 右移動ｽﾋﾟｰﾄﾞ
-		private int		_nForcedFallCount;		// 強制落下ｽﾋﾟｰﾄﾞ
-		private int		_nNaturalFallCount;		// 自然落下ｽﾋﾟｰﾄﾞ
+		private int		_nMoveLeftCount;		// 左移動スピード
+		private int		_nMoveRightCount;		// 右移動スピード
+		private int		_nForcedFallCount;		// 強制落下スピード
+		private int		_nNaturalFallCount;		// 自然落下スピード
 
 		private FormMain FORM_MAIN;
 
-		//========================================================================================
-		// Name		: ProcBlock
-		// Function	: ｺﾝｽﾄﾗｸﾀ
-		//
-		// Parameter	| Format			|i/o| Description
-		//----------------------------------------------------------------------------------------
-		// dat			| Data				| i | Data
-		//----------------------------------------------------------------------------------------
-		// Return		| void				| o | Nothing
-		//========================================================================================
+		/// <summary>
+		/// Constructor
+		/// </summary>
 		public ProcBlock( Data tmp, FormMain frm )
 		{
 			FORM_MAIN = frm;
@@ -41,14 +34,14 @@ namespace Tetris
 		//========================================================================================
 		public void CreateNextBlock()
 		{
-			// Nextﾌﾞﾛｯｸのｲﾝｽﾀﾝｽを現在のｲﾝｽﾀﾝｽとする。
+			// Nextブロックのインスタンスを現在のインスタンスとする。
 			dat.fbNow = dat.fbNext;
 
-			// 次のﾌﾞﾛｯｸﾀｲﾌﾟを乱数で決める
+			// 次のブロックタイプを乱数で決める
 			Random rand = new Random();
 			int nType = rand.Next( 0, FallingBlock.BLOCKTYPES );
 
-			//Nextﾌﾞﾛｯｸのｲﾝｽﾀﾝｽ作成
+			//Nextブロックのインスタンス作成
 			dat.fbNext = new FallingBlock( nType );
 
 			// ランダムな回数回転
@@ -68,14 +61,12 @@ namespace Tetris
 				if( dat.FIELDBLOCK.IsPiledUp( dat.fbNow, dat.fbNow.X, dat.fbNow.Y ) )
 				{
 					dat.stateApp = Status.GameOver;
-					FORM_MAIN.EndMediaPlayer();
 				}
 			}
 		}
-		//========================================================================================
-		// Name		: UpdateBlock
-		// Function	: ﾌﾞﾛｯｸ情報を更新
-		//========================================================================================
+		/// <summary>
+		/// Block情報を更新
+		/// </summary>
 		public void UpdateBlock()
 		{
 			if( dat.nFlashingCount > 0 )
@@ -88,19 +79,18 @@ namespace Tetris
 			}
 		}
 
-		//========================================================================================
-		// Name		: FlashBlock
-		// Function	: ﾌﾞﾛｯｸをﾌﾗｯｼｭ
-		//========================================================================================
+		/// <summary>
+		/// ブロックをフラッシュ
+		/// </summary>
 		private void FlashBlock()
 		{
 			dat.nFlashingCount--;
-			if( dat.nFlashingCount > 0 )	return;	// ﾌﾗｯｼｭ中。この間ﾌﾞﾛｯｸは動かない。
+			if( dat.nFlashingCount > 0 )	return;	// フラッシュ中。この間ブロックは動かない。
 
-			// ﾌﾗｯｼｭ終了
+			// フラッシュ終了
 			dat.nFlashingCount = 0;
 
-			// 消した行数をｶｳﾝﾄしてｽｺｱに反映させる。
+			// 消した行数をｶｳﾝﾄしてスコアに反映させる。
 			int nErasedLines = 0;
 			for ( int y = dat.Y_MAX - 1; y >= 0; y-- )
 			{
@@ -117,7 +107,7 @@ namespace Tetris
 				}
 			}
 
-			// ｽｺｱ計算
+			// スコア計算
 			CalculateScore( nErasedLines );
 
 			// 次のブロックを作成し設定
@@ -125,7 +115,7 @@ namespace Tetris
 		}
 		//========================================================================================
 		// Name		: MoveBlock
-		// Function	: ﾌﾞﾛｯｸを移動。
+		// Function	: ブロックを移動。
 		//========================================================================================
 		private void MoveBlock()
 		{
@@ -199,10 +189,10 @@ namespace Tetris
 				// 行全体がブロックで埋め尽くされている場合
 				if ( dat.FIELDBLOCK.IsLineFilled( y ) == true )
 				{
-					//一行でも消せる行があったらﾌﾗｯｼｭする。
+					//一行でも消せる行があったらフラッシュする。
 					dat.nFlashingCount = 40;
 
-					// 該当行のﾌﾞﾛｯｸをCOLOR_INVALIDで塗りつぶす
+					// 該当行のブロックをCOLOR_INVALIDで塗りつぶす
 					dat.FIELDBLOCK.FillLine( y, FallingBlock.COLOR_INVALID );
 
 					nFlachLines++;
@@ -210,15 +200,15 @@ namespace Tetris
 			}
 			switch( nFlachLines )
 			{
-				case 0:		Music.StartWav( "./Land.wav" );		break;
-				case 1:		Music.StartWav( "./Flash1.wav" );	break;
-				case 2:		Music.StartWav( "./Flash2.wav" );	break;
-				case 3:		Music.StartWav( "./Flash3.wav" );	break;
-				case 4:		Music.StartWav( "./Flash4.wav" );	break;
+				case 0:		Music.StartWav( "Land.wav" );		break;
+				case 1:		Music.StartWav( "Flash1.wav" );	break;
+				case 2:		Music.StartWav( "Flash2.wav" );	break;
+				case 3:		Music.StartWav( "Flash3.wav" );	break;
+				case 4:		Music.StartWav( "Flash4.wav" );	break;
 				default:	break;
 			}
 
-			// 消える行がなかった時は次のﾌﾞﾛｯｸを作成する。
+			// 消える行がなかった時は次のブロックを作成する。
 			if ( dat.nFlashingCount == 0 )
 			{
 				CreateNextBlock();
@@ -226,7 +216,7 @@ namespace Tetris
 		}
 		//========================================================================================
 		// Name		: MoveLeft
-		// Function	: ﾌﾞﾛｯｸを左へ移動
+		// Function	: ブロックを左へ移動
 		//
 		// Parameter	| Format			|i/o| Description
 		//----------------------------------------------------------------------------------------
@@ -240,7 +230,7 @@ namespace Tetris
 				return false;
 			}
 
-			// Fieldﾌﾞﾛｯｸと接している場合は移動できない。
+			// Fieldブロックと接している場合は移動できない。
 			if( dat.FIELDBLOCK.IsPiledUp( dat.fbNow, dat.fbNow.X - 1, dat.fbNow.Y ) )
 			{
 				return false;
@@ -253,7 +243,7 @@ namespace Tetris
 
 		//========================================================================================
 		// Name		: MoveRight
-		// Function	: ﾌﾞﾛｯｸを右へ移動
+		// Function	: ブロックを右へ移動
 		//
 		// Parameter	| Format			|i/o| Description
 		//----------------------------------------------------------------------------------------
@@ -267,7 +257,7 @@ namespace Tetris
 				return false;
 			}
 
-			// Fieldﾌﾞﾛｯｸと接している場合は移動できない。
+			// Fieldブロックと接している場合は移動できない。
 			if( dat.FIELDBLOCK.IsPiledUp( dat.fbNow, dat.fbNow.X + 1, dat.fbNow.Y ) )
 			{
 				return false;
@@ -279,7 +269,7 @@ namespace Tetris
 
 		//========================================================================================
 		// Name		: MoveDown
-		// Function	: ﾌﾞﾛｯｸを下へ移動
+		// Function	: ブロックを下へ移動
 		//
 		// Parameter	| Format			|i/o| Description
 		//----------------------------------------------------------------------------------------
@@ -293,7 +283,7 @@ namespace Tetris
 				return false;
 			}
 
-			// Fieldﾌﾞﾛｯｸと接している場合は移動できない。
+			// Fieldブロックと接している場合は移動できない。
 			if( dat.FIELDBLOCK.IsPiledUp( dat.fbNow, dat.fbNow.X, dat.fbNow.Y + 1 ) )
 			{
 				return false;
@@ -323,7 +313,7 @@ namespace Tetris
 			if ( dat.X_MAX <= dat.fbNow.X + fbClone.RightEdge().X )		return;
 			if ( dat.Y_MAX <= dat.fbNow.Y + fbClone.BottomEdge().Y )	return;
 
-			// Fieldﾌﾞﾛｯｸと重なり合った場合は回転できない
+			// Fieldブロックと重なり合った場合は回転できない
 			if ( dat.FIELDBLOCK.IsPiledUp( fbClone, fbClone.X, fbClone.Y ) )
 			{
 				return;
@@ -335,7 +325,7 @@ namespace Tetris
 
 		//========================================================================================
 		// Name		: CalculateScore
-		// Function	: 消した行数からｽｺｱ計算
+		// Function	: 消した行数からスコア計算
 		//
 		// Parameter	| Format			|i/o| Description
 		//----------------------------------------------------------------------------------------

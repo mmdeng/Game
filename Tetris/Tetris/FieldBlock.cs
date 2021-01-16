@@ -7,10 +7,9 @@ namespace Tetris
 	/// </summary>
 	public class FieldBlock : Block
 	{
-		//--------------------------------------------------------------------------------
-		// 名前: FieldBlock()
-		// 概要: コンストラクタ
-		//--------------------------------------------------------------------------------
+		/// <summary>
+		/// Constructor
+		/// </summary>
 		public FieldBlock( int width, int height ) : base( width, height, 0 )
 		{
 		}

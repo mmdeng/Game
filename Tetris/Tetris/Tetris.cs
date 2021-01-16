@@ -12,11 +12,11 @@ class Tetris
 	private readonly ProcBlock	_proc = null;
 	private readonly FormMain	_FORM_MAIN = null;
 
-	//========================================================================================
-	// Name		: Tetris
-	// Function	: ｺﾝｽﾄﾗｸﾀ。ﾌｫｰﾑ作成処理、初期化処理
-	//========================================================================================
-	public Tetris()
+		/// <summary>
+		/// Constructor
+		/// フォーム作成処理、初期化処理
+		/// </summary>
+		public Tetris()
 	{
 		_dat			= new Data();
 
@@ -44,7 +44,7 @@ class Tetris
 		Draw.MakeBackGround( _dat );
 
 		_proc.CreateNextBlock();		// Next作成。
-		_proc.CreateNextBlock();		// NextをNowにｺﾋﾟｰして、新たにNext作成。
+		_proc.CreateNextBlock();		// NextをNowにコピーして、新たにNext作成。
 
 		// 初期化は完了しているか
 		if ( _dat.bInitialized == false )
@@ -62,7 +62,7 @@ class Tetris
 
 	//========================================================================================
 	// Name		: MainLoop
-	// Function	: ﾒｲﾝﾙｰﾌﾟ
+	// Function	: メインループ
 	//========================================================================================
 	public void MainLoop()
 	{
@@ -75,7 +75,7 @@ class Tetris
 			// fpsを固定
 			while ( true )
 			{
-				// 30ms経過したらﾙｰﾌﾟを抜ける。
+				// 30ms経過したらループを抜ける。
 				dtmCurr = DateTime.Now;
 				tspDiff = dtmCurr - dtmLast;
 				if ( 30 < tspDiff.TotalMilliseconds )
@@ -86,7 +86,7 @@ class Tetris
 				System.Threading.Thread.Sleep( 1 );
 			}
 
-			// ﾌﾞﾛｯｸﾃﾞｰﾀ更新
+			// ブロックデータ更新
 			if ( _dat.stateApp == Status.GamePlaying )
 			{
 				_proc.UpdateBlock();
@@ -97,7 +97,6 @@ class Tetris
 			OnPaint( null, new PaintEventArgs( g, _FORM_MAIN.ClientRectangle ) );
 			g.Dispose();
 
-			// 全てのｳｨﾝﾄﾞｳｽﾞﾒｯｾｰｼﾞを処理する。
 			Application.DoEvents();
 		}
 
@@ -107,7 +106,7 @@ class Tetris
 
 	//========================================================================================
 	// Name		: Dispose
-	// Function	: ﾘｿｰｽ解放
+	// Function	: リソース解放
 	//========================================================================================
 	private void Dispose()
 	{
@@ -155,7 +154,7 @@ class Tetris
 
 	//========================================================================================
 	// Name		: OnKeyDown
-	// Function	: ｷｰ押下時
+	// Function	: キー押下時
 	//========================================================================================
 	private void OnKeyDown( object sender, KeyEventArgs e )
 	{
@@ -192,7 +191,7 @@ class Tetris
 
 	//========================================================================================
 	// Name		: OnKeyUp
-	// Function	: ｷｰ解放
+	// Function	: キー解放
 	//========================================================================================
 	private void OnKeyUp( object sender, KeyEventArgs e )
 	{

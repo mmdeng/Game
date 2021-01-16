@@ -2,49 +2,51 @@ using System;
 using System.Drawing;
 using System.Windows.Forms;
 using System.Runtime.InteropServices;
-
+using System.Reflection;
+using System.Media;
+using System.IO;
 
 namespace Tetris
 {
-	//ﾃﾞｰﾀｸﾗｽ
+	//データクラス
 	public class Data
 	{
 		//------------------------------------------------------------
 		// Readonly
-		public readonly int		X_MAX;					// X方向ﾌｨｰﾙﾄﾞﾌﾞﾛｯｸ最大数
-		public readonly int		Y_MAX;					// X方向ﾌｨｰﾙﾄﾞﾌﾞﾛｯｸ最大数
+		public readonly int		X_MAX;					// X方向フィールドブロック最大数
+		public readonly int		Y_MAX;					// X方向フィールドブロック最大数
 
-		public readonly int		BLOCK_WIDTH;			// ﾌﾞﾛｯｸ1個分の幅
-		public readonly int		BLOCK_HEIGHT;			// ﾌﾞﾛｯｸ1個分の高さ
+		public readonly int		BLOCK_WIDTH;			// ブロック1個分の幅
+		public readonly int		BLOCK_HEIGHT;			// ブロック1個分の高さ
 
-		public readonly Rect	RCT_DISP;				// ﾒｲﾝ画面ｻｲｽﾞ
-		public readonly Rect	RCT_FIELD;				// ﾌｨｰﾙﾄﾞ領域ｻｲｽﾞ
-		public readonly Rect	RCT_NEXT;				// Nextﾌﾞﾛｯｸ表示領域ｻｲｽﾞ
-		public readonly Rect	RCT_SCORE;				// ｽｺｱ領域ｻｲｽﾞ
+		public readonly Rect	RCT_DISP;				// メイン画面サイズ
+		public readonly Rect	RCT_FIELD;				// フィールド領域サイズ
+		public readonly Rect	RCT_NEXT;				// Nextブロック表示領域サイズ
+		public readonly Rect	RCT_SCORE;				// スコア領域サイズ
 
-		public readonly Bitmap	BMP_BLOCK = null;		// ﾌﾞﾛｯｸ色付け用ﾋﾞｯﾄﾏｯﾌﾟ
-		public readonly Bitmap	BMP_BACK = null;		// 背景ﾋﾞｯﾄﾏｯﾌﾟ
+		public readonly Bitmap	BMP_BLOCK = null;		// ブロック色付け用ビットマップ
+		public readonly Bitmap	BMP_BACK = null;		// 背景ビットマップ
 
-		public readonly FieldBlock FIELDBLOCK = null;	// ﾌｨｰﾙﾄﾞﾌﾞﾛｯｸｲﾝｽﾀﾝｽ
+		public readonly FieldBlock FIELDBLOCK = null;	// フィールドブロックインスタンス
 
 		//------------------------------------------------------------
 		// ReadWrite
 		public FallingBlock		fbNow = null;			// 現在のFallingBlock
 		public FallingBlock		fbNext = null;			// 次のFallingBlock
 
-		public Status	stateApp;						// ｹﾞｰﾑｽﾃｰﾀｽ(enum)
-		public Score	score;							// ｽｺｱ構造体
+		public Status	stateApp;						// ゲームステータス(enum)
+		public Score	score;							// スコア構造体
 
-		public bool		bInitialized;					// 初期化ﾌﾗｸﾞ
-		public bool		bContinueLoop;					// ﾒｲﾝﾙｰﾌﾟ脱出用ﾌﾗｸﾞ
-		public bool		bDisposed;						// Dispose済みﾌﾗｸﾞ
+		public bool		bInitialized;					// 初期化フラグ
+		public bool		bContinueLoop;					// メインループ脱出用フラグ
+		public bool		bDisposed;						// Dispose済みフラグ
 
 
-		public int		nFlashingCount;					// ﾌﾞﾛｯｸを消した時のﾌﾗｯｼｭ時間
+		public int		nFlashingCount;					// ブロックを消した時のフラッシュ時間
 
-		public bool		bKeyLeftPressed;				// 左ｷｰ押下ﾌﾗｸﾞ
-		public bool		bKeyRightPressed;				// 右ｷｰ押下ﾌﾗｸﾞ
-		public bool		bKeyDownPressed;				// 下ｷｰ押下ﾌﾗｸﾞ
+		public bool		bKeyLeftPressed;				// 左キー押下フラグ
+		public bool		bKeyRightPressed;				// 右キー押下フラグ
+		public bool		bKeyDownPressed;				// 下キー押下フラグ
 
 		public Data()
 		{
@@ -97,7 +99,9 @@ namespace Tetris
 			// ブロック用ビットマップ
 			try
 			{
-				BMP_BLOCK = (Bitmap)Bitmap.FromFile( "Block.bmp" );
+				var assm = Assembly.GetExecutingAssembly();
+				var stream = assm.GetManifestResourceStream("Tetris.Resources.Block.bmp");
+				BMP_BLOCK= (Bitmap)Image.FromStream(stream);
 			}
 			catch ( System.IO.FileNotFoundException ex )
 			{
@@ -113,7 +117,7 @@ namespace Tetris
 		}
 		private void Initialize()
 		{
-			// ｽｺｱ
+			// スコア
 			score = new Score();
 			score.Reset();
 
@@ -187,10 +191,10 @@ namespace Tetris
 			SND_FILENAME	= 0x00020000,
 			SND_RESOURCE	= 0x00040004
 		}
-		[DllImport("winmm.dll")]
-		extern static bool PlaySound( string pszSound, IntPtr hMod, FdwSound fdwSound );
+		//[DllImport("winmm.dll")]
+		//extern static bool PlaySound( string pszSound, IntPtr hMod, FdwSound fdwSound );
 
-		private static bool _bPlaying = false;
+		//private static bool _bPlaying = false;
 
 		//========================================================================================
 		// Name		: StartWav
@@ -198,37 +202,47 @@ namespace Tetris
 		//========================================================================================
 		public static void StartWav( string szFileName )
 		{
-			PlaySound( szFileName, 
-				IntPtr.Zero, FdwSound.SND_ASYNC | FdwSound.SND_FILENAME );
+            var a = Assembly.GetExecutingAssembly();
+            var s = a.GetManifestResourceStream("Tetris.Resources." + szFileName);
+            var player = new SoundPlayer(s);
+            player.Play();
+
+            //MediaPlayer myPlayer = new MediaPlayer();
+            //myPlayer.Open(new System.Uri(audioPath));
+            //myPlayer.Play();
+
+   //         var path = Path.Combine("Resources", szFileName);
+			//PlaySound(path,
+			//	IntPtr.Zero, FdwSound.SND_ASYNC | FdwSound.SND_FILENAME );
 		}
-		//========================================================================================
-		// Name		: EndWav
-		// Function	: 
-		//========================================================================================
-		public static bool EndWav()
-		{
-			if( _bPlaying == false )	return false;
+		////========================================================================================
+		//// Name		: EndWav
+		//// Function	: 
+		////========================================================================================
+		//public static bool EndWav()
+		//{
+		//	if( _bPlaying == false )	return false;
 
-			bool bRet = PlaySound( null, IntPtr.Zero, 0 );
+		//	bool bRet = PlaySound( null, IntPtr.Zero, 0 );
 
-			_bPlaying = !bRet;
+		//	_bPlaying = !bRet;
 
-			return bRet;
-		}
+		//	return bRet;
+		//}
 
-		//========================================================================================
-		// Name		: LoopWav
-		// Function	: 
-		//========================================================================================
-		public static bool LoopWav( string szFileName )
-		{
-			if( _bPlaying == true )	return false;
+		////========================================================================================
+		//// Name		: LoopWav
+		//// Function	: 
+		////========================================================================================
+		//public static bool LoopWav( string szFileName )
+		//{
+		//	if( _bPlaying == true )	return false;
 
-			_bPlaying = PlaySound( szFileName, 
-				IntPtr.Zero, FdwSound.SND_ASYNC | FdwSound.SND_FILENAME | FdwSound.SND_LOOP );
+		//	_bPlaying = PlaySound( szFileName, 
+		//		IntPtr.Zero, FdwSound.SND_ASYNC | FdwSound.SND_FILENAME | FdwSound.SND_LOOP );
 
-			return _bPlaying;
-		}
+		//	return _bPlaying;
+		//}
 		//========================================================================================
 		// Name		: StartMm
 		// Function	: 

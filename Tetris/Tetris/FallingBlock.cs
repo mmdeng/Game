@@ -6,27 +6,25 @@ namespace Tetris
 	public class FallingBlock : Block,ICloneable
 	{
 
-		public const int	BLOCKTYPES = 7;				// ﾌﾞﾛｯｸﾀｲﾌﾟ数
-		public const int	COLOR_INVALID = 8;			// 無効ﾌﾞﾛｯｸの色
+		public const int	BLOCKTYPES = 7;				// ブロックタイプ数
+		public const int	COLOR_INVALID = 8;			// 無効ブロックの色
 
-		protected int _nLocationX;						// 落下ﾌﾞﾛｯｸ左上の位置
+		protected int _nLocationX;						// 落下ブロック左上の位置
 		public int X
 		{
 			get { return _nLocationX; }
 			set { _nLocationX = value; }
 		}
 
-		protected int _nLocationY;						// 落下ﾌﾞﾛｯｸ左上の位置
+		protected int _nLocationY;						// 落下ブロック左上の位置
 		public int Y
 		{
 			get { return _nLocationY; }
 			set { _nLocationY = value; }
 		}
-
-		//========================================================================================
-		// Name		: FallingBlock
-		// Function	: ｺﾝｽﾄﾗｸﾀ
-		//========================================================================================
+		/// <summary>
+		/// Constructor
+		/// </summary>
 		static FallingBlock()
 		{
 		}
@@ -39,13 +37,13 @@ namespace Tetris
 
 		//========================================================================================
 		// Name		: Create
-		// Function	: 落下ﾌﾞﾛｯｸを作成
+		// Function	: 落下ブロックを作成
 		//
 		// Parameter	| Format			|i/o| Description
 		//----------------------------------------------------------------------------------------
-		// nType		| int				| o | ﾌﾞﾛｯｸﾀｲﾌﾟ
+		// nType		| int				| o | ブロックタイプ
 		//----------------------------------------------------------------------------------------
-		// Return		| int[,]			| o | 落下ﾌﾞﾛｯｸ
+		// Return		| int[,]			| o | 落下ブロック
 		//========================================================================================
 		private static int[,] Create( int nType )
 		{
@@ -139,11 +137,11 @@ namespace Tetris
 
 		//========================================================================================
 		// Name		: Clone
-		// Function	: ｸﾛｰﾝ作成(厳密型指定つき)
+		// Function	: クローン作成(厳密型指定つき)
 		//
 		// Parameter	| Format			|i/o| Description
 		//----------------------------------------------------------------------------------------
-		// Return		| FallingBlock		| o | ｸﾛｰﾝ
+		// Return		| FallingBlock		| o | クローン
 		//========================================================================================
 		public FallingBlock Clone()
 		{
@@ -159,13 +157,13 @@ namespace Tetris
 
 		//========================================================================================
 		// Name		: Rotate
-		// Function	: ﾌﾞﾛｯｸを回転させる
+		// Function	: ブロックを回転させる
 		//
 		// Parameter	| Format			|i/o| Description
 		//----------------------------------------------------------------------------------------
-		// block		| FallingBlock		| i | 回転前のﾌﾞﾛｯｸ
+		// block		| FallingBlock		| i | 回転前のブロック
 		//----------------------------------------------------------------------------------------
-		// Return		| FallingBlock		| o | 回転後のﾌﾞﾛｯｸ(ｸﾛｰﾝ)
+		// Return		| FallingBlock		| o | 回転後のブロック(クローン)
 		//========================================================================================
 		public static FallingBlock Rotate( FallingBlock block )
 		{

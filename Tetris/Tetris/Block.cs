@@ -21,11 +21,9 @@ namespace Tetris
 		{
 			get { return _nHeight; }
 		}
-
-		//--------------------------------------------------------------------------------
-		// 名前: Block()
-		// 概要: コンストラクタ
-		//--------------------------------------------------------------------------------
+		/// <summary>
+		/// Constructor
+		/// </summary>
 		public Block( int width, int height ) : this( width, height, 0 )
 		{
 		}
