@@ -33,13 +33,13 @@ namespace Tetris
 
 		public FormMain(Size clientSize) : this()
 		{
-			this.ClientSize = clientSize;
+			ClientSize = clientSize;
 		}
 
-		public void StartMediaPlayer()
+		public static void StartMediaPlayer()
 		{
 		}
-		public void EndMediaPlayer()
+		public static void EndMediaPlayer()
 		{
 		}
 

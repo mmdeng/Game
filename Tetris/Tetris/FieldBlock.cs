@@ -27,9 +27,9 @@ namespace Tetris
 
 		public void Initialize(int fill)
 		{
-			for (int y = 0; y < this.Height; y++)
+			for (int y = 0; y < Height; y++)
 			{
-				for (int x = 0; x < this.Width; x++)
+				for (int x = 0; x < Width; x++)
 				{
 					this[x, y] = fill;
 				}
@@ -49,11 +49,11 @@ namespace Tetris
 		/// <param name="value"></param>
 		public void FillLine(int y, int value)
 		{
-			if (y < 0 || _nHeight <= y)
+			if (y < 0 || _height <= y)
 			{
-				throw new ArgumentOutOfRangeException("y");
+				throw new ArgumentOutOfRangeException(nameof(y));
 			}
-			for (int x = 0; x < _nWidth; x++)
+			for (int x = 0; x < _width; x++)
 			{
 				this[x, y] = value;
 			}
@@ -67,10 +67,9 @@ namespace Tetris
 			FillLine(y, 0);
 
 			// それより上の行を下に詰める
-			int i;
-			for (i = y; i >= 1; i--)
+			for (var i = y; i >= 1; i--)
 			{
-				for (int x = 0; x < _nWidth; x++)
+				for (var x = 0; x < _width; x++)
 				{
 					this[x, i] = this[x, i - 1];
 				}
@@ -83,11 +82,11 @@ namespace Tetris
 		/// <returns></returns>
 		public bool IsLineFilled(int y)
 		{
-			if (y < 0 || _nHeight <= y)
+			if (y < 0 || _height <= y)
 			{
-				throw new ArgumentOutOfRangeException("y");
+				throw new ArgumentOutOfRangeException(nameof(y));
 			}
-			for (int x = 0; x < _nWidth; x++)
+			for (int x = 0; x < _width; x++)
 			{
 				if (this[x, y] == 0)
 				{
@@ -103,11 +102,11 @@ namespace Tetris
 		/// <returns></returns>
 		public bool IsLineEmpty(int y)
 		{
-			if (y < 0 || _nHeight <= y)
+			if (y < 0 || _height <= y)
 			{
-				throw new ArgumentOutOfRangeException("y");
+				throw new ArgumentOutOfRangeException(nameof(y));
 			}
-			for (int x = 0; x < _nWidth; x++)
+			for (int x = 0; x < _width; x++)
 			{
 				if (this[x, y] != 0)
 				{
@@ -120,11 +119,11 @@ namespace Tetris
 		/// 任意の位置にブロックを張り付ける
 		/// </summary>
 		/// <param name="block"></param>
-		/// <param name="nPosX"></param>
-		/// <param name="nPosY"></param>
-		public void Paste(Block block, int nPosX, int nPosY)
+		/// <param name="x"></param>
+		/// <param name="y"></param>
+		public void Paste(Block block, int x, int y)
 		{
-			if (block == null) throw new ArgumentNullException("block");
+			if (block == null) throw new ArgumentNullException(nameof(block));
 
 			for (int nx = 0; nx < block.Width; nx++)
 			{
@@ -132,7 +131,7 @@ namespace Tetris
 				{
 					if (block[nx, ny] != 0)
 					{
-						this[nPosX + nx, nPosY + ny] = block[nx, ny];
+						this[x + nx, y + ny] = block[nx, ny];
 					}
 				}
 			}
@@ -156,16 +155,14 @@ namespace Tetris
 		}
 		public static bool IsPiledUp(Block block1, Block block2, int osX, int osY)
 		{
-			if (block1 == null) throw new ArgumentNullException("block1");
-			if (block2 == null) throw new ArgumentNullException("block2");
+			if (block1 == null) throw new ArgumentNullException(nameof(block1));
+			if (block2 == null) throw new ArgumentNullException(nameof(block2));
 
-			int w = (block1.Width <= block2.Width ? block1.Width : block2.Width);
-			int h = (block1.Height <= block2.Height ? block1.Height : block2.Height);
-			int x, y;
-
-			for (x = 0; x < w; x++)
+			var w = block1.Width <= block2.Width ? block1.Width : block2.Width;
+			var h = block1.Height <= block2.Height ? block1.Height : block2.Height;
+			for (var x = 0; x < w; x++)
 			{
-				for (y = 0; y < h; y++)
+				for (var y = 0; y < h; y++)
 				{
 					if (block1[x + osX, y + osY] != 0 && block2[x, y] != 0)
 					{

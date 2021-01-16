@@ -6,7 +6,7 @@ namespace Tetris
 {
 	class Tetris
 	{
-		private readonly Data _dat = null;
+		private readonly Data _data = null;
 		private readonly ProcBlock _proc = null;
 		private readonly FormMain _FORM_MAIN = null;
 
@@ -16,16 +16,17 @@ namespace Tetris
 		/// </summary>
 		public Tetris()
 		{
-			_dat = new Data();
+			_data = new Data();
 
 			// ディスプレイを初期化
 			try
 			{
-				_FORM_MAIN = new FormMain(new Size(_dat.RCT_DISP.W, _dat.RCT_DISP.H));
+                _FORM_MAIN = new FormMain(new Size(_data.MAIN_AREA.W, _data.MAIN_AREA.H))
+                {
+                    Text = "Tetris"
+                };
 
-				_FORM_MAIN.Text = "Tetris";
-
-				_FORM_MAIN.Closed += new EventHandler(OnClose);
+                _FORM_MAIN.Closed += new EventHandler(OnClose);
 				_FORM_MAIN.Paint += new PaintEventHandler(OnPaint);
 				_FORM_MAIN.KeyDown += new KeyEventHandler(OnKeyDown);
 				_FORM_MAIN.KeyUp += new KeyEventHandler(OnKeyUp);
@@ -36,16 +37,16 @@ namespace Tetris
 				return;
 			}
 
-			_proc = new ProcBlock(_dat, _FORM_MAIN);
+			_proc = new ProcBlock(_data);
 
 			// 背景画像を描画
-			Draw.MakeBackGround(_dat);
+			Draw.MakeBackGround(_data);
 
 			_proc.CreateNextBlock();        // Next作成。
 			_proc.CreateNextBlock();        // NextをNowにコピーして、新たにNext作成。
 
 			// 初期化は完了しているか
-			if (_dat.bInitialized == false)
+			if (!_data.Initialized)
 			{
 				MessageBox.Show("初期化を完了できませんでした。　アプリケーションを終了します。", "Tetris", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
 
@@ -60,33 +61,30 @@ namespace Tetris
 		/// </summary>
 		public void MainLoop()
 		{
-			DateTime dtmLast = DateTime.Now;
-			DateTime dtmCurr = DateTime.Now;
-			TimeSpan tspDiff;
-
-			while (_dat.bContinueLoop == true)
+			var lastTime = DateTime.Now;
+			while (_data.ContinueLoop)
 			{
 				// fpsを固定
 				while (true)
 				{
 					// 30ms経過したらループを抜ける。
-					dtmCurr = DateTime.Now;
-					tspDiff = dtmCurr - dtmLast;
+					var time = DateTime.Now;
+					var tspDiff = time - lastTime;
 					if (30 < tspDiff.TotalMilliseconds)
 					{
-						dtmLast = dtmCurr;
+						lastTime = time;
 						break;
 					}
 					System.Threading.Thread.Sleep(1);
 				}
 
 				// ブロックデータ更新
-				if (_dat.stateApp == Status.GamePlaying)
+				if (_data.stateApp == GameStatus.Playing)
 				{
 					_proc.UpdateBlock();
 				}
 				// 強制的に再描画
-				Graphics g = _FORM_MAIN.CreateGraphics();
+				var g = _FORM_MAIN.CreateGraphics();
 				OnPaint(null, new PaintEventArgs(g, _FORM_MAIN.ClientRectangle));
 				g.Dispose();
 
@@ -103,22 +101,22 @@ namespace Tetris
 			// これ以降は再描画禁止
 			_FORM_MAIN.Paint -= new PaintEventHandler(OnPaint);
 
-			if (_dat.BMP_BLOCK != null)
+			if (_data.BLOCK_BITMAP != null)
 			{
-				_dat.BMP_BLOCK.Dispose();
+				_data.BLOCK_BITMAP.Dispose();
 			}
-			if (_dat.BMP_BACK != null)
+			if (_data.BACKGROUND_BITMAP != null)
 			{
-				_dat.BMP_BACK.Dispose();
+				_data.BACKGROUND_BITMAP.Dispose();
 			}
-			_FORM_MAIN.EndMediaPlayer();
+            FormMain.EndMediaPlayer();
 
 			if (_FORM_MAIN != null)
 			{
 				_FORM_MAIN.Close();
 				_FORM_MAIN.Dispose();
 			}
-			_dat.bDisposed = true;
+			_data.Disposed = true;
 		}
 		/// <summary>
 		/// 画面終了
@@ -127,7 +125,7 @@ namespace Tetris
 		/// <param name="e"></param>
 		private void OnClose(object sender, EventArgs e)
 		{
-			_dat.bContinueLoop = false;
+			_data.ContinueLoop = false;
 		}
 		/// <summary>
 		/// 再描画
@@ -136,7 +134,7 @@ namespace Tetris
 		/// <param name="e"></param>
 		private void OnPaint(object sender, PaintEventArgs e)
 		{
-			Draw.DrawGame(_dat, e);
+			Draw.DrawGame(_data, e);
 		}
 
 		/// <summary>
@@ -151,21 +149,21 @@ namespace Tetris
 				case Keys.Left: goto case Keys.NumPad4;
 				case Keys.NumPad4:
 					{
-						_dat.bKeyLeftPressed = true;
+						_data.KeyLeftPressed = true;
 						break;
 					}
 
 				case Keys.Right: goto case Keys.NumPad6;
 				case Keys.NumPad6:
 					{
-						_dat.bKeyRightPressed = true;
+						_data.KeyRightPressed = true;
 						break;
 					}
 
 				case Keys.Down: goto case Keys.NumPad2;
 				case Keys.NumPad2:
 					{
-						_dat.bKeyDownPressed = true;
+						_data.KeyDownPressed = true;
 						break;
 					}
 				case Keys.Space:
@@ -188,49 +186,49 @@ namespace Tetris
 				case Keys.Left: goto case Keys.NumPad4;
 				case Keys.NumPad4:
 					{
-						_dat.bKeyLeftPressed = false;   // ←
+						_data.KeyLeftPressed = false;   // ←
 						break;
 					}
 
 				case Keys.Right: goto case Keys.NumPad6;
 				case Keys.NumPad6:
 					{
-						_dat.bKeyRightPressed = false;  // →
+						_data.KeyRightPressed = false;  // →
 						break;
 					}
 
 				case Keys.Down: goto case Keys.NumPad2;
 				case Keys.NumPad2:
 					{
-						_dat.bKeyDownPressed = false;   // ↓
+						_data.KeyDownPressed = false;   // ↓
 						break;
 					}
 
 				case Keys.Enter:
 					{
 						//Enter:GameStart
-						if (_dat.stateApp != Status.GamePlaying)
+						if (_data.stateApp != GameStatus.Playing)
 						{
-							_FORM_MAIN.StartMediaPlayer();
-							_dat.score.Reset();
+                            FormMain.StartMediaPlayer();
+							_data.score.Reset();
 							_proc.CreateNextBlock();
-							_dat.stateApp = Status.GamePlaying;
+							_data.stateApp = GameStatus.Playing;
 						}
 						break;
 					}
 
 				case Keys.Escape:
 					{
-						_FORM_MAIN.EndMediaPlayer();
-						if (_dat.stateApp == Status.GamePlaying)
+                        FormMain.EndMediaPlayer();
+						if (_data.stateApp == GameStatus.Playing)
 						{
 							// ゲーム中止
-							_dat.stateApp = Status.GameOver;
+							_data.stateApp = GameStatus.Over;
 						}
 						else
 						{
 							// 終了
-							_dat.bContinueLoop = false;
+							_data.ContinueLoop = false;
 						}
 						break;
 					}

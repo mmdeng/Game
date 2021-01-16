@@ -4,28 +4,37 @@ namespace Tetris
 {
 	public class ProcBlock
 	{
-		private Data dat;
+		private readonly Data data;
 
-		private int _nMoveLeftCount;        // 左移動スピード
-		private int _nMoveRightCount;       // 右移動スピード
-		private int _nForcedFallCount;      // 強制落下スピード
-		private int _nNaturalFallCount;     // 自然落下スピード
-
-		private FormMain FORM_MAIN;
+		/// <summary>
+		/// 左移動スピード
+		/// </summary>
+		private int _moveLeftCount;
+		/// <summary>
+		/// 右移動スピード
+		/// </summary>
+		private int _moveRightCount;
+		/// <summary>
+		/// 強制落下スピード
+		/// </summary>
+		private int _forcedFallCount;
+		/// <summary>
+		/// 自然落下スピード
+		/// </summary>
+		private int _naturalFallCount;
 
 		/// <summary>
 		/// Constructor
 		/// </summary>
-		public ProcBlock(Data tmp, FormMain frm)
+		public ProcBlock(Data tmp)
 		{
-			FORM_MAIN = frm;
-			dat = tmp;
+			data = tmp;
 
-			_nMoveLeftCount = 0;
-			_nMoveRightCount = 0;
+			_moveLeftCount = 0;
+			_moveRightCount = 0;
 
-			_nForcedFallCount = 0;
-			_nNaturalFallCount = 0;
+			_forcedFallCount = 0;
+			_naturalFallCount = 0;
 		}
 		/// <summary>
 		/// 次の落下ブロックを作成
@@ -33,32 +42,32 @@ namespace Tetris
 		public void CreateNextBlock()
 		{
 			// Nextブロックのインスタンスを現在のインスタンスとする。
-			dat.fbNow = dat.fbNext;
+			data.CurrentBlock = data.NextBlock;
 
 			// 次のブロックタイプを乱数で決める
-			Random rand = new Random();
-			int nType = rand.Next(0, FallingBlock.BLOCKTYPES);
+			var rand = new Random();
+			var type = rand.Next(0, FallingBlock.BLOCKTYPES);
 
 			//Nextブロックのインスタンス作成
-			dat.fbNext = new FallingBlock(nType);
+			data.NextBlock = new FallingBlock(type);
 
 			// ランダムな回数回転
-			int nRotate = rand.Next(4);
-			for (int i = 0; i < nRotate; i++)
+			var rotate = rand.Next(4);
+			for (int i = 0; i < rotate; i++)
 			{
-				dat.fbNext = dat.fbNext.Rotate();
+				data.NextBlock = data.NextBlock.Rotate();
 			}
 
-			if (dat.fbNow != null)
+			if (data.CurrentBlock != null)
 			{
 				// 一番上の真中から落ちてくる。
-				dat.fbNow.X = (dat.X_MAX - dat.fbNow.Width) / 2;
-				dat.fbNow.Y = 0;
+				data.CurrentBlock.X = (data.X_MAX - data.CurrentBlock.Width) / 2;
+				data.CurrentBlock.Y = 0;
 
 				// もしフィールドのブロックに接触したらゲームオーバー
-				if (dat.FIELDBLOCK.IsPiledUp(dat.fbNow, dat.fbNow.X, dat.fbNow.Y))
+				if (data.FIELD_BLOCK.IsPiledUp(data.CurrentBlock, data.CurrentBlock.X, data.CurrentBlock.Y))
 				{
-					dat.stateApp = Status.GameOver;
+					data.stateApp = GameStatus.Over;
 				}
 			}
 		}
@@ -67,7 +76,7 @@ namespace Tetris
 		/// </summary>
 		public void UpdateBlock()
 		{
-			if (dat.nFlashingCount > 0)
+			if (data.FlashingCount > 0)
 			{
 				FlashBlock();
 			}
@@ -81,30 +90,30 @@ namespace Tetris
 		/// </summary>
 		private void FlashBlock()
 		{
-			dat.nFlashingCount--;
-			if (dat.nFlashingCount > 0) return; // フラッシュ中。この間ブロックは動かない。
+			data.FlashingCount--;
+			if (data.FlashingCount > 0) return; // フラッシュ中。この間ブロックは動かない。
 
 			// フラッシュ終了
-			dat.nFlashingCount = 0;
+			data.FlashingCount = 0;
 
 			// 消した行数をｶｳﾝﾄしてスコアに反映させる。
-			int nErasedLines = 0;
-			for (int y = dat.Y_MAX - 1; y >= 0; y--)
+			int erasedLines = 0;
+			for (int y = data.Y_MAX - 1; y >= 0; y--)
 			{
-				if (dat.FIELDBLOCK[0, y] == FallingBlock.COLOR_INVALID)
+				if (data.FIELD_BLOCK[0, y] == FallingBlock.COLOR_INVALID)
 				{
 					// 行を消去して下に詰める
-					dat.FIELDBLOCK.EraseLine(y);
+					data.FIELD_BLOCK.EraseLine(y);
 
 					// 消去した行
-					nErasedLines++;
+					erasedLines++;
 
 					// 消した行を再チェック
 					y++;
 				}
 			}
 			// スコア計算
-			CalculateScore(nErasedLines);
+			CalculateScore(erasedLines);
 
 			// 次のブロックを作成し設定
 			CreateNextBlock();
@@ -117,56 +126,56 @@ namespace Tetris
 			const int FORCED_FALL_SPEED = 2;
 			const int NATURAL_FALL_SPEED = 8;
 
-			if (dat.bKeyLeftPressed == true)
+			if (data.KeyLeftPressed == true)
 			{
-				_nMoveLeftCount++;
-				if (FORCED_FALL_SPEED < _nMoveLeftCount)
+				_moveLeftCount++;
+				if (FORCED_FALL_SPEED < _moveLeftCount)
 				{
-					_nMoveLeftCount = 0;
+					_moveLeftCount = 0;
 					MoveLeft();
 				}
 			}
-			if (dat.bKeyRightPressed == true)
+			if (data.KeyRightPressed == true)
 			{
-				_nMoveRightCount++;
-				if (FORCED_FALL_SPEED < _nMoveRightCount)
+				_moveRightCount++;
+				if (FORCED_FALL_SPEED < _moveRightCount)
 				{
-					_nMoveRightCount = 0;
+					_moveRightCount = 0;
 					MoveRight();
 				}
 			}
 			//ボタンを押しているかどうかに関わらず、1回は下に落ちる。
-			bool bLanded = false;
-			if (dat.bKeyDownPressed == true)
+			bool isLanded = false;
+			if (data.KeyDownPressed == true)
 			{
 				// 強制落下
-				_nForcedFallCount++;
-				if (FORCED_FALL_SPEED < _nForcedFallCount)
+				_forcedFallCount++;
+				if (FORCED_FALL_SPEED < _forcedFallCount)
 				{
-					_nForcedFallCount = 0;
+					_forcedFallCount = 0;
 
-					bLanded = !MoveDown();
-					if (bLanded == false)
+					isLanded = !MoveDown();
+					if (isLanded == false)
 					{
-						dat.score.TotalScore += 1;  // 下に進めると1点入る
+						data.score.TotalScore += 1;  // 下に進めると1点入る
 					}
 				}
 			}
 			else
 			{
 				// 自然落下
-				_nNaturalFallCount++;
-				if (NATURAL_FALL_SPEED < _nNaturalFallCount)
+				_naturalFallCount++;
+				if (NATURAL_FALL_SPEED < _naturalFallCount)
 				{
-					_nNaturalFallCount = 0;
+					_naturalFallCount = 0;
 
 					// 落下させる
-					bLanded = !MoveDown();
+					isLanded = !MoveDown();
 				}
 			}
 
 			// 着地処理
-			if (bLanded == true) Landed();
+			if (isLanded == true) Landed();
 		}
 		/// <summary>
 		/// 着地処理
@@ -174,24 +183,24 @@ namespace Tetris
 		private void Landed()
 		{
 			// フィールドのブロックとする
-			dat.FIELDBLOCK.Paste(dat.fbNow, dat.fbNow.X, dat.fbNow.Y);
+			data.FIELD_BLOCK.Paste(data.CurrentBlock, data.CurrentBlock.X, data.CurrentBlock.Y);
 
-			int nFlachLines = 0;
-			for (int y = 0; y < dat.Y_MAX; y++)
+			int flashingLines = 0;
+			for (int y = 0; y < data.Y_MAX; y++)
 			{
 				// 行全体がブロックで埋め尽くされている場合
-				if (dat.FIELDBLOCK.IsLineFilled(y) == true)
+				if (data.FIELD_BLOCK.IsLineFilled(y) == true)
 				{
 					//一行でも消せる行があったらフラッシュする。
-					dat.nFlashingCount = 40;
+					data.FlashingCount = 40;
 
 					// 該当行のブロックをCOLOR_INVALIDで塗りつぶす
-					dat.FIELDBLOCK.FillLine(y, FallingBlock.COLOR_INVALID);
+					data.FIELD_BLOCK.FillLine(y, FallingBlock.COLOR_INVALID);
 
-					nFlachLines++;
+					flashingLines++;
 				}
 			}
-			switch (nFlachLines)
+			switch (flashingLines)
 			{
 				case 0: Music.StartWav("Land.wav"); break;
 				case 1: Music.StartWav("Flash1.wav"); break;
@@ -202,7 +211,7 @@ namespace Tetris
 			}
 
 			// 消える行がなかった時は次のブロックを作成する。
-			if (dat.nFlashingCount == 0)
+			if (data.FlashingCount == 0)
 			{
 				CreateNextBlock();
 			}
@@ -210,65 +219,65 @@ namespace Tetris
 		/// <summary>
 		/// ブロックを左へ移動
 		/// </summary>
-		/// <returns>True:移動成功　　False:移動失敗</returns>
+		/// <returns>True:移動成功, False:移動失敗</returns>
 		private bool MoveLeft()
 		{
 			// 壁に接していたら移動できない。
-			if (dat.fbNow.X + dat.fbNow.LeftEdge().X <= 0)
+			if (data.CurrentBlock.X + data.CurrentBlock.LeftEdge().X <= 0)
 			{
 				return false;
 			}
 
 			// Fieldブロックと接している場合は移動できない。
-			if (dat.FIELDBLOCK.IsPiledUp(dat.fbNow, dat.fbNow.X - 1, dat.fbNow.Y))
+			if (data.FIELD_BLOCK.IsPiledUp(data.CurrentBlock, data.CurrentBlock.X - 1, data.CurrentBlock.Y))
 			{
 				return false;
 			}
 
 			//移動実行
-			dat.fbNow.X--;
+			data.CurrentBlock.X--;
 			return true;
 		}
 		/// <summary>
 		/// ブロックを右へ移動
 		/// </summary>
-		/// <returns>True:移動成功　　False:移動失敗</returns>
+		/// <returns>True:移動成功, False:移動失敗</returns>
 		private bool MoveRight()
 		{
 			// 壁に接していたら移動できない。
-			if (dat.X_MAX - 1 <= dat.fbNow.X + dat.fbNow.RightEdge().X)
+			if (data.X_MAX - 1 <= data.CurrentBlock.X + data.CurrentBlock.RightEdge().X)
 			{
 				return false;
 			}
 
 			// Fieldブロックと接している場合は移動できない。
-			if (dat.FIELDBLOCK.IsPiledUp(dat.fbNow, dat.fbNow.X + 1, dat.fbNow.Y))
+			if (data.FIELD_BLOCK.IsPiledUp(data.CurrentBlock, data.CurrentBlock.X + 1, data.CurrentBlock.Y))
 			{
 				return false;
 			}
 			//移動実行
-			dat.fbNow.X++;
+			data.CurrentBlock.X++;
 			return true;
 		}
 		/// <summary>
 		/// ブロックを下へ移動
 		/// </summary>
-		/// <returns>True:移動成功　　False:移動失敗(着地した)</returns>
+		/// <returns>True:移動成功, False:移動失敗</returns>
 		private bool MoveDown()
 		{
 			// 壁に接していたら移動できない。
-			if (dat.Y_MAX - 1 <= dat.fbNow.Y + dat.fbNow.BottomEdge().Y)
+			if (data.Y_MAX - 1 <= data.CurrentBlock.Y + data.CurrentBlock.BottomEdge().Y)
 			{
 				return false;
 			}
 
 			// Fieldブロックと接している場合は移動できない。
-			if (dat.FIELDBLOCK.IsPiledUp(dat.fbNow, dat.fbNow.X, dat.fbNow.Y + 1))
+			if (data.FIELD_BLOCK.IsPiledUp(data.CurrentBlock, data.CurrentBlock.X, data.CurrentBlock.Y + 1))
 			{
 				return false;
 			}
 
-			dat.fbNow.Y++;
+			data.CurrentBlock.Y++;
 			return true;
 		}
 		/// <summary>
@@ -276,39 +285,38 @@ namespace Tetris
 		/// </summary>
 		public void Rotate()
 		{
-			if (dat.nFlashingCount > 0) return;
+			if (data.FlashingCount > 0) return;
 
 			// 回転後のブロックを取得
-			FallingBlock fbClone = dat.fbNow.Rotate();
+			var fbClone = data.CurrentBlock.Rotate();
 
 			// 壁からはみ出る場合は回転できない
 			if (fbClone.X + fbClone.LeftEdge().X < 0) return;
-			if (dat.X_MAX <= dat.fbNow.X + fbClone.RightEdge().X) return;
-			if (dat.Y_MAX <= dat.fbNow.Y + fbClone.BottomEdge().Y) return;
+			if (data.X_MAX <= data.CurrentBlock.X + fbClone.RightEdge().X) return;
+			if (data.Y_MAX <= data.CurrentBlock.Y + fbClone.BottomEdge().Y) return;
 
 			// Fieldブロックと重なり合った場合は回転できない
-			if (dat.FIELDBLOCK.IsPiledUp(fbClone, fbClone.X, fbClone.Y))
+			if (data.FIELD_BLOCK.IsPiledUp(fbClone, fbClone.X, fbClone.Y))
 			{
 				return;
 			}
-
 			// 回転成功。回転後のインスタンスを設定
-			dat.fbNow = fbClone;
+			data.CurrentBlock = fbClone;
 		}
 		/// <summary>
 		/// 消した行数からスコア計算
 		/// </summary>
-		/// <param name="nErasedLines">消した行数</param>
-		private void CalculateScore(int nErasedLines)
+		/// <param name="erasedLines">消した行数</param>
+		private void CalculateScore(int erasedLines)
 		{
-			switch (nErasedLines)
+			switch (erasedLines)
 			{
-				case 1: dat.score.Single++; dat.score.TotalScore += 100; break;
-				case 2: dat.score.Double++; dat.score.TotalScore += 200; break;
-				case 3: dat.score.Triple++; dat.score.TotalScore += 500; break;
-				case 4: dat.score.Tetris++; dat.score.TotalScore += 1000; break;
+				case 1: data.score.Single++; data.score.TotalScore += 100; break;
+				case 2: data.score.Double++; data.score.TotalScore += 200; break;
+				case 3: data.score.Triple++; data.score.TotalScore += 500; break;
+				case 4: data.score.Tetris++; data.score.TotalScore += 1000; break;
 			}
-			dat.score.Lines += nErasedLines;
+			data.score.Lines += erasedLines;
 		}
 	}
 }

@@ -7,19 +7,19 @@ namespace Tetris
 	/// </summary>
 	public class Block
 	{
-		protected int[,] _Block;
+		protected int[,] Blocks;
 
-		protected int _nWidth;
-		protected int _nHeight;
+		protected int _width;
+		protected int _height;
 
 		public int Width
 		{
-			get { return _nWidth; }
+			get { return _width; }
 		}
 
 		public int Height
 		{
-			get { return _nHeight; }
+			get { return _height; }
 		}
 		/// <summary>
 		/// Constructor
@@ -27,33 +27,30 @@ namespace Tetris
 		public Block(int width, int height) : this(width, height, 0)
 		{
 		}
-		public Block(int width, int height, int nKind)
+		public Block(int width, int height, int type)
 		{
-			if (width <= 0) throw new ArgumentOutOfRangeException("width");
-			if (height <= 0) throw new ArgumentOutOfRangeException("height");
+			if (width <= 0) throw new ArgumentOutOfRangeException(nameof(width));
+			if (height <= 0) throw new ArgumentOutOfRangeException(nameof(height));
 
-			this._nWidth = width;
-			this._nHeight = height;
+			this._width = width;
+			this._height = height;
 
-			_Block = new int[width, height];
+			Blocks = new int[width, height];
 
 			// 初期化
-			for (int y = 0; y < height; y++)
+			for (var y = 0; y < height; y++)
 			{
-				for (int x = 0; x < width; x++)
+				for (var x = 0; x < width; x++)
 				{
-					_Block[x, y] = nKind;
+					Blocks[x, y] = type;
 				}
 			}
 		}
 
-		public Block(int[,] nBlock)
+		public Block(int[,] blocks)
 		{
-			if (nBlock == null)
-			{
-				throw new ArgumentNullException("block");
-			}
-			this.SetBlockArray(nBlock);
+			if (blocks == null) throw new ArgumentNullException(nameof(blocks));
+			SetBlockArray(blocks);
 		}
 		/// <summary>
 		/// インデクサ
@@ -67,7 +64,7 @@ namespace Tetris
 			{
 				if (IsLocationInRange(x, y))
 				{
-					return _Block[x, y];
+					return Blocks[x, y];
 				}
 				return 0;
 			}
@@ -75,7 +72,7 @@ namespace Tetris
 			{
 				if (IsLocationInRange(x, y))
 				{
-					_Block[x, y] = value;
+					Blocks[x, y] = value;
 				}
 			}
 		}
@@ -85,19 +82,19 @@ namespace Tetris
 		/// <returns></returns>
 		protected int[,] GetBlockArray()
 		{
-			return (int[,])_Block.Clone();
+			return (int[,])Blocks.Clone();
 		}
 		/// <summary>
 		/// ブロックの内部表記を設定する
 		/// </summary>
-		/// <param name="nBlock"></param>
-		protected void SetBlockArray(int[,] nBlock)
+		/// <param name="blocks"></param>
+		protected void SetBlockArray(int[,] blocks)
 		{
-			if (nBlock == null) throw new ArgumentNullException("block");
+			if (blocks == null) throw new ArgumentNullException(nameof(blocks));
 
-			this._Block = (int[,])nBlock.Clone();
-			_nWidth = nBlock.GetLength(0);
-			_nHeight = nBlock.GetLength(1);
+			Blocks = (int[,])blocks.Clone();
+			_width = blocks.GetLength(0);
+			_height = blocks.GetLength(1);
 		}
 
 		/// <summary>
@@ -108,7 +105,7 @@ namespace Tetris
 		/// <returns></returns>
 		private bool IsLocationInRange(int x, int y)
 		{
-			return (0 <= x && x < _nWidth) && (0 <= y && y < _nHeight);
+			return (0 <= x && x < _width) && (0 <= y && y < _height);
 		}
 	}
 }
