@@ -12,7 +12,7 @@ using System.Windows.Forms;
 
 namespace Tetris
 {
-    public partial class FormMain : Form
+	public partial class FormMain : Form
 	{
 		/// <summary>
 		/// ダメ。2つ以上の音をMixして鳴らすことができない。
@@ -43,9 +43,9 @@ namespace Tetris
 		{
 		}
 
-        private void FormMain_Load(object sender, EventArgs e)
-        {
+		private void FormMain_Load(object sender, EventArgs e)
+		{
 
-        }
-    }
+		}
+	}
 }

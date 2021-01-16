@@ -8,91 +8,156 @@ using System.IO;
 
 namespace Tetris
 {
-	//データクラス
+	/// <summary>
+	/// データクラス
+	/// </summary>
 	public class Data
 	{
-		//------------------------------------------------------------
-		// Readonly
-		public readonly int		X_MAX;					// X方向フィールドブロック最大数
-		public readonly int		Y_MAX;					// X方向フィールドブロック最大数
+		/// <summary>
+		/// X方向フィールドブロック最大数
+		/// </summary>
+		public readonly int X_MAX;
+		/// <summary>
+		/// X方向フィールドブロック最大数
+		/// </summary>
+		public readonly int Y_MAX;
 
-		public readonly int		BLOCK_WIDTH;			// ブロック1個分の幅
-		public readonly int		BLOCK_HEIGHT;			// ブロック1個分の高さ
+		/// <summary>
+		/// ブロック1個分の幅
+		/// </summary>
+		public readonly int BLOCK_WIDTH;
+		/// <summary>
+		/// ブロック1個分の高さ
+		/// </summary>
+		public readonly int BLOCK_HEIGHT;
+		/// <summary>
+		/// メイン画面サイズ
+		/// </summary>
+		public readonly Rect RCT_DISP;
+		/// <summary>
+		/// フィールド領域サイズ
+		/// </summary>
+		public readonly Rect RCT_FIELD;
+		/// <summary>
+		/// Nextブロック表示領域サイズ
+		/// </summary>
+		public readonly Rect RCT_NEXT;
+		/// <summary>
+		/// スコア領域サイズ
+		/// </summary>
+		public readonly Rect RCT_SCORE;
 
-		public readonly Rect	RCT_DISP;				// メイン画面サイズ
-		public readonly Rect	RCT_FIELD;				// フィールド領域サイズ
-		public readonly Rect	RCT_NEXT;				// Nextブロック表示領域サイズ
-		public readonly Rect	RCT_SCORE;				// スコア領域サイズ
+		/// <summary>
+		/// ブロック色付け用ビットマップ
+		/// </summary>
+		public readonly Bitmap BMP_BLOCK = null;
+		/// <summary>
+		/// 背景ビットマップ
+		/// </summary>
+		public readonly Bitmap BMP_BACK = null;
 
-		public readonly Bitmap	BMP_BLOCK = null;		// ブロック色付け用ビットマップ
-		public readonly Bitmap	BMP_BACK = null;		// 背景ビットマップ
+		/// <summary>
+		/// フィールドブロックインスタンス
+		/// </summary>
+		public readonly FieldBlock FIELDBLOCK = null;
 
-		public readonly FieldBlock FIELDBLOCK = null;	// フィールドブロックインスタンス
+		/// <summary>
+		/// 現在のFallingBlock
+		/// </summary>
+		public FallingBlock fbNow = null;
+		/// <summary>
+		/// 次のFallingBlock
+		/// </summary>
+		public FallingBlock fbNext = null;
 
-		//------------------------------------------------------------
-		// ReadWrite
-		public FallingBlock		fbNow = null;			// 現在のFallingBlock
-		public FallingBlock		fbNext = null;			// 次のFallingBlock
+		/// <summary>
+		/// ゲームステータス
+		/// </summary>
+		public Status stateApp;
+		/// <summary>
+		/// スコア構造体
+		/// </summary>
+		public Score score;
 
-		public Status	stateApp;						// ゲームステータス(enum)
-		public Score	score;							// スコア構造体
+		/// <summary>
+		/// 初期化フラグ
+		/// </summary>
+		public bool bInitialized;
+		/// <summary>
+		/// メインループ脱出用フラグ
+		/// </summary>
+		public bool bContinueLoop;
+		/// <summary>
+		/// Dispose済みフラグ
+		/// </summary>
+		public bool bDisposed;
 
-		public bool		bInitialized;					// 初期化フラグ
-		public bool		bContinueLoop;					// メインループ脱出用フラグ
-		public bool		bDisposed;						// Dispose済みフラグ
 
+		/// <summary>
+		/// ブロックを消した時のフラッシュ時間
+		/// </summary>
+		public int nFlashingCount;
 
-		public int		nFlashingCount;					// ブロックを消した時のフラッシュ時間
-
-		public bool		bKeyLeftPressed;				// 左キー押下フラグ
-		public bool		bKeyRightPressed;				// 右キー押下フラグ
-		public bool		bKeyDownPressed;				// 下キー押下フラグ
-
+		/// <summary>
+		/// 左キー押下フラグ
+		/// </summary>
+		public bool bKeyLeftPressed;
+		/// <summary>
+		/// 右キー押下フラグ
+		/// </summary>
+		public bool bKeyRightPressed;
+		/// <summary>
+		/// 下キー押下フラグ
+		/// </summary>
+		public bool bKeyDownPressed;
+		/// <summary>
+		/// 
+		/// </summary>
 		public Data()
 		{
-			RCT_DISP	= new Rect();
-			RCT_FIELD	= new Rect();
-			RCT_NEXT	= new Rect();
-			RCT_SCORE	= new Rect();
+			RCT_DISP = new Rect();
+			RCT_FIELD = new Rect();
+			RCT_NEXT = new Rect();
+			RCT_SCORE = new Rect();
 
 			// 各座標値
-			BLOCK_WIDTH  = 24;
+			BLOCK_WIDTH = 24;
 			BLOCK_HEIGHT = 24;
-		
+
 			X_MAX = 10;
 			Y_MAX = 20;
 
-			RCT_FIELD.L	= BLOCK_WIDTH;
-			RCT_FIELD.T	= BLOCK_HEIGHT;
-			RCT_FIELD.W	= X_MAX * BLOCK_WIDTH;
-			RCT_FIELD.H	= Y_MAX * BLOCK_HEIGHT;
+			RCT_FIELD.L = BLOCK_WIDTH;
+			RCT_FIELD.T = BLOCK_HEIGHT;
+			RCT_FIELD.W = X_MAX * BLOCK_WIDTH;
+			RCT_FIELD.H = Y_MAX * BLOCK_HEIGHT;
 
-			RCT_NEXT.W	= 4 * BLOCK_WIDTH;
-			RCT_NEXT.H	= 4 * BLOCK_HEIGHT;
+			RCT_NEXT.W = 4 * BLOCK_WIDTH;
+			RCT_NEXT.H = 4 * BLOCK_HEIGHT;
 
-			RCT_NEXT.L	= RCT_FIELD.L + RCT_FIELD.W + BLOCK_WIDTH;
-			RCT_NEXT.T	= RCT_FIELD.T;
+			RCT_NEXT.L = RCT_FIELD.L + RCT_FIELD.W + BLOCK_WIDTH;
+			RCT_NEXT.T = RCT_FIELD.T;
 
-			RCT_SCORE.W	= 125;
-			RCT_SCORE.H	= 150;
+			RCT_SCORE.W = 125;
+			RCT_SCORE.H = 150;
 
-			RCT_SCORE.L	= RCT_NEXT.L;
-			RCT_SCORE.T	= RCT_FIELD.T + RCT_FIELD.H - RCT_SCORE.H;
+			RCT_SCORE.L = RCT_NEXT.L;
+			RCT_SCORE.T = RCT_FIELD.T + RCT_FIELD.H - RCT_SCORE.H;
 
-			RCT_DISP.W	= RCT_SCORE.L + RCT_SCORE.W + BLOCK_WIDTH;
-			RCT_DISP.H	= RCT_FIELD.T + RCT_FIELD.H + BLOCK_HEIGHT;
+			RCT_DISP.W = RCT_SCORE.L + RCT_SCORE.W + BLOCK_WIDTH;
+			RCT_DISP.H = RCT_FIELD.T + RCT_FIELD.H + BLOCK_HEIGHT;
 
 			// フィールドブロック
-			FIELDBLOCK = new FieldBlock( X_MAX, Y_MAX, 0 );
+			FIELDBLOCK = new FieldBlock(X_MAX, Y_MAX, 0);
 
 			// 背景用ビットマップ
 			try
 			{
-				BMP_BACK = new Bitmap( RCT_DISP.W, RCT_DISP.H );
+				BMP_BACK = new Bitmap(RCT_DISP.W, RCT_DISP.H);
 			}
-			catch ( Exception ex )
+			catch (Exception ex)
 			{
-				MessageBox.Show( "例外エラーが発生しました\r\n" + ex.Message, "Tetris", MessageBoxButtons.OK, MessageBoxIcon.Exclamation );
+				MessageBox.Show("例外エラーが発生しました\r\n" + ex.Message, "Tetris", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
 				return;
 			}
 
@@ -101,20 +166,23 @@ namespace Tetris
 			{
 				var assm = Assembly.GetExecutingAssembly();
 				var stream = assm.GetManifestResourceStream("Tetris.Resources.Block.bmp");
-				BMP_BLOCK= (Bitmap)Image.FromStream(stream);
+				BMP_BLOCK = (Bitmap)Image.FromStream(stream);
 			}
-			catch ( System.IO.FileNotFoundException ex )
+			catch (System.IO.FileNotFoundException ex)
 			{
-				MessageBox.Show( "ファイルが見つかりません。\r\n" + ex.Message, "Tetris", MessageBoxButtons.OK, MessageBoxIcon.Exclamation );
+				MessageBox.Show("ファイルが見つかりません。\r\n" + ex.Message, "Tetris", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
 				return;
 			}
-			catch ( Exception ex )
+			catch (Exception ex)
 			{
-				MessageBox.Show( "例外エラーが発生しました\r\n" + ex.Message, "Tetris", MessageBoxButtons.OK, MessageBoxIcon.Exclamation );
+				MessageBox.Show("例外エラーが発生しました\r\n" + ex.Message, "Tetris", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
 				return;
 			}
 			Initialize();
 		}
+		/// <summary>
+		/// 
+		/// </summary>
 		private void Initialize()
 		{
 			// スコア
@@ -134,7 +202,9 @@ namespace Tetris
 
 		}
 	}
-	//矩形
+	/// <summary>
+	/// 矩形
+	/// </summary>
 	public class Rect
 	{
 		public int L;
@@ -143,10 +213,12 @@ namespace Tetris
 		public int H;
 		public Rectangle GetRect()
 		{
-			return new Rectangle( L, T, W, H );
+			return new Rectangle(L, T, W, H);
 		}
 	}
-	//得点
+	/// <summary>
+	/// 得点
+	/// </summary>
 	public struct Score
 	{
 		public int TotalScore;
@@ -166,8 +238,9 @@ namespace Tetris
 			Tetris = 0;
 		}
 	}
-
-	//ｱﾌﾟﾘｹｰｼｮﾝ状態
+	/// <summary>
+	/// アプリケーション状態
+	/// </summary>
 	public enum Status
 	{
 		Title,
@@ -179,86 +252,29 @@ namespace Tetris
 	{
 		private enum FdwSound : uint
 		{
-			SND_SYNC		= 0x0000,
-			SND_ASYNC		= 0x0001,
-			SND_NODEFAULT	= 0x0002,
-			SND_MEMORY		= 0x0004,
-			SND_LOOP		= 0x0008,
-			SND_NOSTOP		= 0x0010,
-			SND_NOWAIT		= 0x00002000,
-			SND_ALIAS		= 0x00010000,
-			SND_ALIAS_ID	= 0x00110000,
-			SND_FILENAME	= 0x00020000,
-			SND_RESOURCE	= 0x00040004
+			SND_SYNC = 0x0000,
+			SND_ASYNC = 0x0001,
+			SND_NODEFAULT = 0x0002,
+			SND_MEMORY = 0x0004,
+			SND_LOOP = 0x0008,
+			SND_NOSTOP = 0x0010,
+			SND_NOWAIT = 0x00002000,
+			SND_ALIAS = 0x00010000,
+			SND_ALIAS_ID = 0x00110000,
+			SND_FILENAME = 0x00020000,
+			SND_RESOURCE = 0x00040004
 		}
-		//[DllImport("winmm.dll")]
-		//extern static bool PlaySound( string pszSound, IntPtr hMod, FdwSound fdwSound );
-
-		//private static bool _bPlaying = false;
-
-		//========================================================================================
-		// Name		: StartWav
-		// Function	: 
-		//========================================================================================
-		public static void StartWav( string szFileName )
+		public static void StartWav(string szFileName)
 		{
-            var a = Assembly.GetExecutingAssembly();
-            var s = a.GetManifestResourceStream("Tetris.Resources." + szFileName);
-            var player = new SoundPlayer(s);
-            player.Play();
-
-            //MediaPlayer myPlayer = new MediaPlayer();
-            //myPlayer.Open(new System.Uri(audioPath));
-            //myPlayer.Play();
-
-   //         var path = Path.Combine("Resources", szFileName);
-			//PlaySound(path,
-			//	IntPtr.Zero, FdwSound.SND_ASYNC | FdwSound.SND_FILENAME );
+			var a = Assembly.GetExecutingAssembly();
+			var s = a.GetManifestResourceStream("Tetris.Resources." + szFileName);
+			var player = new SoundPlayer(s);
+			player.Play();
 		}
-		////========================================================================================
-		//// Name		: EndWav
-		//// Function	: 
-		////========================================================================================
-		//public static bool EndWav()
-		//{
-		//	if( _bPlaying == false )	return false;
-
-		//	bool bRet = PlaySound( null, IntPtr.Zero, 0 );
-
-		//	_bPlaying = !bRet;
-
-		//	return bRet;
-		//}
-
-		////========================================================================================
-		//// Name		: LoopWav
-		//// Function	: 
-		////========================================================================================
-		//public static bool LoopWav( string szFileName )
-		//{
-		//	if( _bPlaying == true )	return false;
-
-		//	_bPlaying = PlaySound( szFileName, 
-		//		IntPtr.Zero, FdwSound.SND_ASYNC | FdwSound.SND_FILENAME | FdwSound.SND_LOOP );
-
-		//	return _bPlaying;
-		//}
-		//========================================================================================
-		// Name		: StartMm
-		// Function	: 
-		//========================================================================================
 		public static bool StartMm()
 		{
-//			axMMControl1.FileName = "./Tetris.WAV";
-//			axMMControl1.Command = "Open" ;
-//			axMMControl1.Command = "Play" ;
-
 			return true;
 		}
-		//========================================================================================
-		// Name		: EndMm
-		// Function	: 
-		//========================================================================================
 		public static bool EndMm()
 		{
 			return true;
@@ -266,9 +282,3 @@ namespace Tetris
 	}
 
 }
-
-
-
-
-
-
