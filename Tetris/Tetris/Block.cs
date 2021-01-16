@@ -105,7 +105,8 @@ namespace Tetris
 		/// <returns></returns>
 		private bool IsLocationInRange(int x, int y)
 		{
-			return (0 <= x && x < _width) && (0 <= y && y < _height);
+			return 0 <= x && x < _width
+				&& 0 <= y && y < _height;
 		}
 	}
 }

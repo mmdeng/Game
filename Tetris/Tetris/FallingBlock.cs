@@ -99,10 +99,9 @@ namespace Tetris
 
 			if (blocks != null)
 			{
-				int x, y;
-				for (x = 0; x < blocks.GetLength(0); x++)
+				for (var x = 0; x < blocks.GetLength(0); x++)
 				{
-					for (y = 0; y < blocks.GetLength(1); y++)
+					for (var y = 0; y < blocks.GetLength(1); y++)
 					{
 						if (blocks[x, y] != 0)
 						{
@@ -126,7 +125,7 @@ namespace Tetris
 		}
 		object ICloneable.Clone()
 		{
-			return this.Clone();
+			return MemberwiseClone();
 		}
 		/// <summary>
 		/// ƒuƒƒbƒN‚ğ‰ñ“]‚³‚¹‚é
@@ -138,14 +137,12 @@ namespace Tetris
 			if (block == null) throw new ArgumentNullException(nameof(block));
 
 			var clone = block.Clone();
-
-			int x, y;
 			var rotated = new int[clone.Width, clone.Height];
 
 			// ‰ñ“] (‰E‰ñ“])
-			for (x = 0; x < clone.Width; x++)
+			for (var x = 0; x < clone.Width; x++)
 			{
-				for (y = 0; y < clone.Height; y++)
+				for (var y = 0; y < clone.Height; y++)
 				{
 					rotated[x, y] = clone[clone.Width - 1 - y, x];
 				}

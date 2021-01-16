@@ -26,9 +26,9 @@ namespace Tetris
 		/// <summary>
 		/// Constructor
 		/// </summary>
-		public ProcBlock(Data tmp)
+		public ProcBlock(Data data)
 		{
-			data = tmp;
+			this.data = data;
 
 			_moveLeftCount = 0;
 			_moveRightCount = 0;
@@ -53,7 +53,7 @@ namespace Tetris
 
 			// ランダムな回数回転
 			var rotate = rand.Next(4);
-			for (int i = 0; i < rotate; i++)
+			for (var i = 0; i < rotate; i++)
 			{
 				data.NextBlock = data.NextBlock.Rotate();
 			}
@@ -97,8 +97,8 @@ namespace Tetris
 			data.FlashingCount = 0;
 
 			// 消した行数をｶｳﾝﾄしてスコアに反映させる。
-			int erasedLines = 0;
-			for (int y = data.Y_MAX - 1; y >= 0; y--)
+			var erasedLines = 0;
+			for (var y = data.Y_MAX - 1; y >= 0; y--)
 			{
 				if (data.FIELD_BLOCK[0, y] == FallingBlock.COLOR_INVALID)
 				{
@@ -126,7 +126,7 @@ namespace Tetris
 			const int FORCED_FALL_SPEED = 2;
 			const int NATURAL_FALL_SPEED = 8;
 
-			if (data.KeyLeftPressed == true)
+			if (data.KeyLeftPressed)
 			{
 				_moveLeftCount++;
 				if (FORCED_FALL_SPEED < _moveLeftCount)
@@ -135,7 +135,7 @@ namespace Tetris
 					MoveLeft();
 				}
 			}
-			if (data.KeyRightPressed == true)
+			if (data.KeyRightPressed)
 			{
 				_moveRightCount++;
 				if (FORCED_FALL_SPEED < _moveRightCount)
@@ -145,8 +145,8 @@ namespace Tetris
 				}
 			}
 			//ボタンを押しているかどうかに関わらず、1回は下に落ちる。
-			bool isLanded = false;
-			if (data.KeyDownPressed == true)
+			var isLanded = false;
+			if (data.KeyDownPressed)
 			{
 				// 強制落下
 				_forcedFallCount++;
@@ -155,7 +155,7 @@ namespace Tetris
 					_forcedFallCount = 0;
 
 					isLanded = !MoveDown();
-					if (isLanded == false)
+					if (!isLanded)
 					{
 						data.score.TotalScore += 1;  // 下に進めると1点入る
 					}
@@ -173,9 +173,8 @@ namespace Tetris
 					isLanded = !MoveDown();
 				}
 			}
-
 			// 着地処理
-			if (isLanded == true) Landed();
+			if (isLanded) Landed();
 		}
 		/// <summary>
 		/// 着地処理
@@ -185,11 +184,11 @@ namespace Tetris
 			// フィールドのブロックとする
 			data.FIELD_BLOCK.Paste(data.CurrentBlock, data.CurrentBlock.X, data.CurrentBlock.Y);
 
-			int flashingLines = 0;
-			for (int y = 0; y < data.Y_MAX; y++)
+			var flashingLines = 0;
+			for (var y = 0; y < data.Y_MAX; y++)
 			{
 				// 行全体がブロックで埋め尽くされている場合
-				if (data.FIELD_BLOCK.IsLineFilled(y) == true)
+				if (data.FIELD_BLOCK.IsLineFilled(y))
 				{
 					//一行でも消せる行があったらフラッシュする。
 					data.FlashingCount = 40;
@@ -288,20 +287,20 @@ namespace Tetris
 			if (data.FlashingCount > 0) return;
 
 			// 回転後のブロックを取得
-			var fbClone = data.CurrentBlock.Rotate();
+			var clone = data.CurrentBlock.Rotate();
 
 			// 壁からはみ出る場合は回転できない
-			if (fbClone.X + fbClone.LeftEdge().X < 0) return;
-			if (data.X_MAX <= data.CurrentBlock.X + fbClone.RightEdge().X) return;
-			if (data.Y_MAX <= data.CurrentBlock.Y + fbClone.BottomEdge().Y) return;
+			if (clone.X + clone.LeftEdge().X < 0) return;
+			if (data.X_MAX <= data.CurrentBlock.X + clone.RightEdge().X) return;
+			if (data.Y_MAX <= data.CurrentBlock.Y + clone.BottomEdge().Y) return;
 
 			// Fieldブロックと重なり合った場合は回転できない
-			if (data.FIELD_BLOCK.IsPiledUp(fbClone, fbClone.X, fbClone.Y))
+			if (data.FIELD_BLOCK.IsPiledUp(clone, clone.X, clone.Y))
 			{
 				return;
 			}
 			// 回転成功。回転後のインスタンスを設定
-			data.CurrentBlock = fbClone;
+			data.CurrentBlock = clone;
 		}
 		/// <summary>
 		/// 消した行数からスコア計算

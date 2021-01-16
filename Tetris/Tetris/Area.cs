@@ -16,6 +16,7 @@ namespace Tetris
 		public int T;
 		public int W;
 		public int H;
+
 		public Rectangle GetRectangle()
 		{
 			return new Rectangle(L, T, W, H);

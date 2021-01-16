@@ -14,7 +14,7 @@ namespace Tetris
 		{
 		}
 
-		public FieldBlock(int width, int height, int nFill) : base(width, height, nFill)
+		public FieldBlock(int width, int height, int fill) : base(width, height, fill)
 		{
 		}
 		/// <summary>
@@ -86,7 +86,7 @@ namespace Tetris
 			{
 				throw new ArgumentOutOfRangeException(nameof(y));
 			}
-			for (int x = 0; x < _width; x++)
+			for (var x = 0; x < _width; x++)
 			{
 				if (this[x, y] == 0)
 				{
@@ -106,7 +106,7 @@ namespace Tetris
 			{
 				throw new ArgumentOutOfRangeException(nameof(y));
 			}
-			for (int x = 0; x < _width; x++)
+			for (var x = 0; x < _width; x++)
 			{
 				if (this[x, y] != 0)
 				{
@@ -125,9 +125,9 @@ namespace Tetris
 		{
 			if (block == null) throw new ArgumentNullException(nameof(block));
 
-			for (int nx = 0; nx < block.Width; nx++)
+			for (var nx = 0; nx < block.Width; nx++)
 			{
-				for (int ny = 0; ny < block.Height; ny++)
+				for (var ny = 0; ny < block.Height; ny++)
 				{
 					if (block[nx, ny] != 0)
 					{
